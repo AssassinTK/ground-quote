@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GROUND 餐廳 — 新增網路線、監控及網管設備報價</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      padding: 32px 20px 60px;
+    }
+
+    /* ── Header ── */
+    .header {
+      max-width: 1100px;
+      margin: 0 auto 36px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px 36px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.07);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+    }
+    .header p { font-size: .9rem; color: #666; line-height: 1.7; }
+
+    .badge {
+      background: #1a1a2e;
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 20px;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .badge .label { font-size: .75rem; opacity: .7; }
+    .badge .date  { font-size: 1rem; font-weight: 600; }
+
+    /* ── Section title ── */
+    .section-title {
+      max-width: 1100px;
+      margin: 0 auto 20px;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #888;
+    }
+
+    /* ── Product grid ── */
+    .grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      transition: transform .2s, box-shadow .2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    }
+
+    .card-img {
+      height: 200px;
+      background: #f7f8fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+    .card-img img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
+    }
+    .item-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: #1a1a2e;
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 700;
+      border-radius: 6px;
+      padding: 3px 8px;
+    }
+
+    .card-body {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .brand-tag {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #eef0ff;
+      color: #4a5568;
+      width: fit-content;
+    }
+
+    .card-name {
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.4;
+      color: #1a1a2e;
+    }
+    .card-spec {
+      font-size: .82rem;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .qty-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .qty-label { font-size: .7rem; color: #aaa; }
+    .qty-val   { font-size: .92rem; font-weight: 600; color: #555; }
+
+    .price-col { text-align: right; }
+    .unit-price { font-size: .72rem; color: #aaa; }
+    .total-price {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #1a1a2e;
+    }
+    .total-price span { font-size: .75rem; font-weight: 500; color: #888; margin-left: 2px; }
+
+    /* ── Summary bar ── */
+    .summary {
+      max-width: 1100px;
+      margin: 36px auto 0;
+      background: #1a1a2e;
+      color: #fff;
+      border-radius: 16px;
+      padding: 24px 36px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .summary-item { text-align: center; }
+    .summary-item .s-label { font-size: .75rem; opacity: .6; margin-bottom: 4px; }
+    .summary-item .s-val { font-size: 1.3rem; font-weight: 700; }
+    .summary-divider { width: 1px; height: 40px; background: rgba(255,255,255,.2); }
+
+    /* ── Footnote ── */
+    .footnote {
+      max-width: 1100px;
+      margin: 20px auto 0;
+      font-size: .78rem;
+      color: #aaa;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>新增網路線、監控及網管設備工程</h1>
+      <p>
+        客戶：<strong>GROUND 餐廳</strong>　台北市內湖區瑞光路 337 號<br>
+        業務：劉家安　｜　松禾　02-7729-2966
+      </p>
+    </div>
+    <div class="badge">
+      <div class="label">報價日期</div>
+      <div class="date">2026 / 05 / 13</div>
+    </div>
+  </div>
+
+  <div class="section-title">產品明細（項次 5、6、7、9 ～ 12）</div>
+
+  <!-- Product cards -->
+  <div class="grid">
+
+    <!-- 項次 5：VIGI NVR -->
+    <div class="card">
+      <div class="card-img">
+        <span class="item-badge">項次 05</span>
+        <img src="https://static.tp-link.com/upload/image-line/1_normal_20231109024249q.jpg"
+             alt="Omada VIGI 8路NVR主機"
+             onerror="this.src='https://placehold.co/400x300/f0f2f5/999?text=VIGI+NVR'">
+      </div>
+      <div class="card-body">
+        <span class="brand-tag">TP-Link VIGI</span>
+        <div class="card-name">Omada VIGI 8路 NVR 主機</div>
+        <div class="card-spec">8 路 PoE+ 網路影像錄影機<br>支援最高 8MP 解析度 / 遠端監控</div>
+        <div class="card-footer">
+          <div class="qty-row">
+            <span class="qty-label">數量</span>
+            <span class="qty-val">1 組</span>
+          </div>
+          <div class="price-col">
+            <div class="unit-price">單價 $10,500</div>
+            <div class="total-price">$10,500 <span>NT</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 項次 6：WD Purple 6TB -->
+    <div class="card">
+      <div class="card-img">
+        <span class="item-badge">項次 06</span>
+        <img src="https://bvsecurity.com/cdn/shop/products/western-digital-6tb-purple-hard-drive.png?v=1741362089&width=600"
+             alt="WD 6TB 監控用硬碟"
+             onerror="this.src='https://placehold.co/400x300/f0f2f5/999?text=WD+Purple+6TB'">
+      </div>
+      <div class="card-body">
+        <span class="brand-tag">Western Digital</span>
+        <div class="card-name">WD Purple 6TB 監控用硬碟</div>
+        <div class="card-spec">3.5" SATA 6Gb/s 監控專用 HDD<br>AllFrame 技術 / 24×7 連續寫入</div>
+        <div class="card-footer">
+          <div class="qty-row">
+            <span class="qty-label">數量</span>
+            <span class="qty-val">1 顆</span>
+          </div>
+          <div class="price-col">
+            <div class="unit-price">單價 $9,000</div>
+            <div class="total-price">$9,000 <span>NT</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 項次 7：VIGI 2MP IPCAM -->
+    <div class="card">
+      <div class="card-img">
+        <span class="item-badge">項次 07</span>
+        <img src="https://static.tp-link.com/upload/image-line/01_normal_20221111022936c.jpg"
+             alt="VIGI 2MP IPCAM"
+             onerror="this.src='https://placehold.co/400x300/f0f2f5/999?text=VIGI+2MP+CAM'">
+      </div>
+      <div class="card-body">
+        <span class="brand-tag">TP-Link VIGI</span>
+        <div class="card-name">VIGI 2MP IP Camera</div>
+        <div class="card-spec">VIGI C220I 2MP 紅外線半球攝影機<br>IP67 防水 / H.265+ / 夜視 30m</div>
+        <div class="card-footer">
+          <div class="qty-row">
+            <span class="qty-label">數量</span>
+            <span class="qty-val">8 組</span>
+          </div>
+          <div class="price-col">
+            <div class="unit-price">單價 $2,500</div>
+            <div class="total-price">$20,000 <span>NT</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 項次 9：Zyxel USG LITE 60AX -->
+    <div class="card">
+      <div class="card-img">
+        <span class="item-badge">項次 09</span>
+        <img src="https://www.zyxel.com/sites/zyxel/files/library/assets/products/usg-lite-60ax/relaunch/usglite60ax_1_1100x1100.png"
+             alt="Zyxel USG LITE 60AX"
+             onerror="this.src='https://placehold.co/400x300/f0f2f5/999?text=USG+LITE+60AX'">
+      </div>
+      <div class="card-body">
+        <span class="brand-tag">Zyxel</span>
+        <div class="card-name">USG LITE 60AX WiFi 6 路由器</div>
+        <div class="card-spec">AX6000 雙 2.5G 埠安全路由器<br>Wi-Fi 6 內建 / VPN / 企業級防火牆</div>
+        <div class="card-footer">
+          <div class="qty-row">
+            <span class="qty-label">數量</span>
+            <span class="qty-val">1 組</span>
+          </div>
+          <div class="price-col">
+            <div class="unit-price">單價 $6,700</div>
+            <div class="total-price">$6,700 <span>NT</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 項次 10：NWA90BE PRO -->
+    <div class="card">
+      <div class="card-img">
+        <span class="item-badge">項次 10</span>
+        <img src="https://www.zyxel.com/sites/zyxel/files/library/assets/products/nwa90be-pro/img_nwa90be_pro_p_600x600.jpg"
+             alt="NWA90BE PRO"
+             onerror="this.src='https://placehold.co/400x300/f0f2f5/999?text=NWA90BE+PRO'">
+      </div>
+      <div class="card-body">
+        <span class="brand-tag">Zyxel</span>
+        <div class="card-name">NWA90BE PRO BE6500 WiFi 7 基地台</div>
+        <div class="card-spec">雙頻 4-Stream / 2.5GbE 上行<br>NebulaFlex 雲端／獨立模式 / MLO</div>
+        <div class="card-footer">
+          <div class="qty-row">
+            <span class="qty-label">數量</span>
+            <span class="qty-val">2 組</span>
+          </div>
+          <div class="price-col">
+            <div class="unit-price">單價 $5,800</div>
+            <div class="total-price">$11,600 <span>NT</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 項次 11：GS1900-16 -->
+    <div class="card">
+      <div class="card-img">
+        <span class="item-badge">項次 11</span>
+        <img src="https://www.zyxel.com/library/assets/products/gs1900-series/img_gs1900-16_v2_p_600x600.jpg"
+             alt="GS1900-16"
+             onerror="this.src='https://placehold.co/400x300/f0f2f5/999?text=GS1900-16'">
+      </div>
+      <div class="card-body">
+        <span class="brand-tag">Zyxel</span>
+        <div class="card-name">GS1900-16 網管型 Gigabit 交換器</div>
+        <div class="card-spec">16 埠 Gigabit / 智慧型網管<br>Fanless 靜音 / VLAN / QoS / Rackmount</div>
+        <div class="card-footer">
+          <div class="qty-row">
+            <span class="qty-label">數量</span>
+            <span class="qty-val">1 組</span>
+          </div>
+          <div class="price-col">
+            <div class="unit-price">單價 $5,200</div>
+            <div class="total-price">$5,200 <span>NT</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 項次 12：GS1005HP -->
+    <div class="card">
+      <div class="card-img">
+        <span class="item-badge">項次 12</span>
+        <img src="https://www.zyxel.com/library/assets/products/gs1005hp/img_gs1005hp_p_600x600.jpg"
+             alt="GS1005HP"
+             onerror="this.src='https://placehold.co/400x300/f0f2f5/999?text=GS1005HP'">
+      </div>
+      <div class="card-body">
+        <span class="brand-tag">Zyxel</span>
+        <div class="card-name">GS1005HP 無網管 PoE 交換器</div>
+        <div class="card-spec">5 埠 Gigabit / 4 埠 PoE（802.3at）<br>60W 總供電 / Fanless / 壁掛可用</div>
+        <div class="card-footer">
+          <div class="qty-row">
+            <span class="qty-label">數量</span>
+            <span class="qty-val">1 組</span>
+          </div>
+          <div class="price-col">
+            <div class="unit-price">單價 $1,400</div>
+            <div class="total-price">$1,400 <span>NT</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.grid -->
+
+  <!-- Summary bar -->
+  <div class="summary">
+    <div class="summary-item">
+      <div class="s-label">項目數</div>
+      <div class="s-val">7 項</div>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <div class="s-label">小計（含稅前）</div>
+      <div class="s-val">$64,400</div>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <div class="s-label">稅金（5%）</div>
+      <div class="s-val">$3,220</div>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <div class="s-label">本頁合計</div>
+      <div class="s-val" style="font-size:1.6rem; color:#f0c040;">$67,620</div>
+    </div>
+  </div>
+
+  <div class="footnote">
+    本頁僅列出設備品項（項次 5、6、7、9～12），不含網路線材及工資。完整報價含稅總計 NT$119,018。<br>
+    報價有效期 30 天。完工後設備免費保固一年（天災人為不在此限）。
+  </div>
+
+</body>
+</html>
